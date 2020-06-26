@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="test.lex" />
+    <None Include="test.y" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="QUT.ShiftReduceParser">
+      <HintPath>..\gppg\gppg-distro-1.4.6\binaries\QUT.ShiftReduceParser.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GeneratedFiles\" />
+  </ItemGroup>
+
+  <Import Project="GP.targets" />
+
+</Project>
