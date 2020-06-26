@@ -14,11 +14,22 @@
       <Output ItemName="Yacc" TaskParameter="Include" />
     </CreateItem>
   </Target>
-  <Target Name="GPLEX"
+  <Target Name="CleanGPLEX"
+          DependsOnTargets="CreateLexItems"
+          AfterTargets="BeforeClean">
+    <Delete Files="@(Lex->'$(GeneratedFilesPath)%(Filename)%(Extension).cs')">
+      <Output ItemName="GplexCleaned" TaskParameter="DeletedFiles" />
+    </Delete>
+    <ItemGroup>
+      <Compile Remove="@(GplexCleaned)" />
+      <FileWrites Remove="@(GplexCleaned)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="RunGPLEX"
           DependsOnTargets="CreateLexItems"
           Inputs="@(Lex)"
           Outputs="@(Lex->'$(GeneratedFilesPath)%(Filename)%(Extension).cs')"
-          AfterTargets="BeforeBuild;BeforeRebuild">
+          AfterTargets="BeforeBuild">
     <Message Text="GPLEX %(Lex.Identity)" Importance="high"/>
     <MakeDir Directories="$(GeneratedFilesPath)"
              Condition="'@(Lex)'!=''" />
@@ -28,18 +39,32 @@
           CustomErrorRegularExpression="^Error: ">
       <Output ItemName="GplexGenerated" TaskParameter="Outputs" />
     </Exec>
-    <ItemGroup>
+  </Target>
+  <Target Name="IncludeGPLEX"
+          AfterTargets="RunGPLEX">
+    <ItemGroup Condition="'@(GplexGenerated)'!=''">
       <Compile Remove="@(GplexGenerated)" />
       <FileWrites Remove="@(GplexGenerated)" />
       <Compile Include="@(GplexGenerated)" />
       <FileWrites Include="@(GplexGenerated)" />
     </ItemGroup>
   </Target>
-  <Target Name="GPPG"
+  <Target Name="CleanGPPG"
+          DependsOnTargets="CreateYaccItems"
+          AfterTargets="BeforeClean">
+    <Delete Files="@(Yacc->'$(GeneratedFilesPath)%(Filename)%(Extension).cs')">
+      <Output ItemName="GppgCleaned" TaskParameter="DeletedFiles" />
+    </Delete>
+    <ItemGroup>
+      <Compile Remove="@(GppgCleaned)" />
+      <FileWrites Remove="@(GppgCleaned)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="RunGPPG"
           DependsOnTargets="CreateYaccItems"
           Inputs="@(Yacc)"
           Outputs="@(Yacc->'$(GeneratedFilesPath)%(Filename)%(Extension).cs')"
-          AfterTargets="BeforeBuild;BeforeRebuild">
+          AfterTargets="BeforeBuild">
     <Message Text="GPPG %(Yacc.Identity)" Importance="high"/>
     <MakeDir Directories="$(GeneratedFilesPath)"
              Condition="'@(Yacc)'!=''" />
@@ -48,10 +73,13 @@
           Outputs="$(GeneratedFilesPath)%(Yacc.Filename)%(Yacc.Extension).cs">
       <Output ItemName="GppgGenerated" TaskParameter="Outputs" />
     </Exec>
-    <ItemGroup>
+  </Target>
+  <Target Name="IncludeGPPG"
+          AfterTargets="RunGPPG">
+    <ItemGroup Condition="'@(GppgGenerated)'!=''">
       <Compile Remove="@(GppgGenerated)" />
-      <Compile Include="@(GppgGenerated)" />
       <FileWrites Remove="@(GppgGenerated)" />
+      <Compile Include="@(GppgGenerated)" />
       <FileWrites Include="@(GppgGenerated)" />
     </ItemGroup>
   </Target>
