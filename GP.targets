@@ -4,12 +4,12 @@
     <GplexExe Condition="'$(GplexExe)'==''">gplex</GplexExe>
     <GppgExe Condition="'$(GppgExe)'==''">gppg</GppgExe>
   </PropertyGroup>
-  <Target Name="CreateLexItems" AfterTargets="BeforeBuild">
+  <Target Name="CreateLexItems" AfterTargets="BeforeBuild;BeforeRebuild">
     <CreateItem Include="@(None)" Condition="'%(Extension)'=='.lex'">
       <Output ItemName="Lex" TaskParameter="Include" />
     </CreateItem>
   </Target>
-  <Target Name="CreateYaccItems" AfterTargets="BeforeBuild">
+  <Target Name="CreateYaccItems" AfterTargets="BeforeBuild;BeforeRebuild">
     <CreateItem Include="@(None)" Condition="'%(Extension)'=='.y'">
       <Output ItemName="Yacc" TaskParameter="Include" />
     </CreateItem>
@@ -22,15 +22,16 @@
     <Message Text="GPLEX %(Lex.Identity)" Importance="high"/>
     <MakeDir Directories="$(GeneratedFilesPath)"
              Condition="'@(Lex)'!=''" />
-    <Message Text="$(GplexExe) /out:- &quot;%(Lex.Identity)&quot; > &quot;$(GeneratedFilesPath)%(Lex.Filename)%(Lex.Extension).cs&quot;" Importance="low" />
-    <Exec Command="$(GplexExe) /out:- &quot;%(Lex.Identity)&quot; > &quot;$(GeneratedFilesPath)%(Lex.Filename)%(Lex.Extension).cs&quot;"
-          Outputs="$(GeneratedFilesPath)%(Lex.Filename)%(Lex.Extension).cs">
+    <Message Text="$(GplexExe) /out:&quot;$(GeneratedFilesPath)%(Lex.Filename)%(Lex.Extension).cs&quot; &quot;%(Lex.Identity)&quot;" Importance="low" />
+    <Exec Command="$(GplexExe) /out:&quot;$(GeneratedFilesPath)%(Lex.Filename)%(Lex.Extension).cs&quot; &quot;%(Lex.Identity)&quot;"
+          Outputs="$(GeneratedFilesPath)%(Lex.Filename)%(Lex.Extension).cs"
+          CustomErrorRegularExpression="^Error: ">
       <Output ItemName="GplexGenerated" TaskParameter="Outputs" />
     </Exec>
     <ItemGroup>
       <Compile Remove="@(GplexGenerated)" />
-      <Compile Include="@(GplexGenerated)" />
       <FileWrites Remove="@(GplexGenerated)" />
+      <Compile Include="@(GplexGenerated)" />
       <FileWrites Include="@(GplexGenerated)" />
     </ItemGroup>
   </Target>
